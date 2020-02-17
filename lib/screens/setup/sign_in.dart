@@ -111,6 +111,6 @@ class SignInScreen extends State<SignIn> {
   }
 
   _onLocationTap(BuildContext context, AuthResult user) {
-    Navigator.pushReplacementNamed(context, '/home', arguments: {'user': user});
+    Navigator.pushNamedAndRemoveUntil(context, '/home',  (_) => false, arguments: {'user': user});
   }
 }
