@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import '../../models/Name.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -74,8 +73,6 @@ class SignInScreen extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<NameModel>(
-        builder: (BuildContext context, Widget child, NameModel model) {
       return Scaffold(
           appBar: AppBar(
             title: Text('Login Here'),
@@ -107,7 +104,6 @@ class SignInScreen extends State<SignIn> {
                   ),
                 ])),
           ));
-    });
   }
 
   _onLocationTap(BuildContext context, AuthResult user) {

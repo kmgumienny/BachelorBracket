@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import '../models/Cleaner.dart';
 
 class DatabaseHelper {
 
@@ -48,41 +47,41 @@ class DatabaseHelper {
     var result = await db.query(nameTable);
     return result;
   }
-
-  Future<int> insertCleaning(Cleaner cleaning) async {
-    Database db = await this.database;
-    var result = await db.insert(nameTable, cleaning.toMap());
-    return result;
-  }
+//
+//  Future<int> insertCleaning(Cleaner cleaning) async {
+//    Database db = await this.database;
+//    var result = await db.insert(nameTable, cleaning.toMap());
+//    return result;
+//  }
 
 //  Future<int> updateCleaning(Cleaner cleaning) async {
 //    var db = await this.database;
 //    var result = await db.update(nameTable, cleaning.toMap(),  whereArgs: [cleaning.id]);
 //    return result;
 //  }
-
-  Future<int> deleteCleaning(int id) async {
-    var db = await this.database;
-    int result = await db.rawDelete('DELETE FROM $nameTable WHERE $colId = $id');
-    return result;
-  }
-
-  Future<int> getCount() async {
-    Database db = await this.database;
-    List<Map<String, dynamic>> x = await db.rawQuery('SELECT COUNT (*) from $nameTable');
-    int result = Sqflite.firstIntValue(x);
-    return result;
-  }
-
-  Future<List<Cleaner>> getCleanerList() async {
-    var noteMapList = await getCleanerMapList();
-    int count = noteMapList.length;
-
-    List<Cleaner> noteList = List<Cleaner>();
-    for (int i = 0; i < count; i++) {
-      noteList.add(Cleaner.fromMapObject(noteMapList[i]));
-    }
-    return noteList;
-  }
+//
+//  Future<int> deleteCleaning(int id) async {
+//    var db = await this.database;
+//    int result = await db.rawDelete('DELETE FROM $nameTable WHERE $colId = $id');
+//    return result;
+//  }
+//
+//  Future<int> getCount() async {
+//    Database db = await this.database;
+//    List<Map<String, dynamic>> x = await db.rawQuery('SELECT COUNT (*) from $nameTable');
+//    int result = Sqflite.firstIntValue(x);
+//    return result;
+//  }
+//
+//  Future<List<Cleaner>> getCleanerList() async {
+//    var noteMapList = await getCleanerMapList();
+//    int count = noteMapList.length;
+//
+//    List<Cleaner> noteList = List<Cleaner>();
+//    for (int i = 0; i < count; i++) {
+//      noteList.add(Cleaner.fromMapObject(noteMapList[i]));
+//    }
+//    return noteList;
+//  }
 
 }
