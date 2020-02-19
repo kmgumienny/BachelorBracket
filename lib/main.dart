@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
           screen = SignIn();
           break;
         case '/home':
-          screen = Home(arguments['user']);
+          screen = Home(arguments['user'], arguments['user_deets'], arguments['admin']);
           break;
         default:
           return null;
