@@ -22,6 +22,8 @@ class _ProfileState extends State<Profile> {
           Text("Your points " + widget.points.toString()),
           Text("Week number: " + widget.week.toString()),
           Text("Number of picks this week " + widget.picks.toString()),
+          Text("We need to make this screen look better and add functionality"
+              " for copmuting score"),
         ],
       ),
     );

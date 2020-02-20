@@ -26,6 +26,7 @@ class _HomeState extends State<Home> {
   static var points;
   static var week;
   static var picks;
+  static var uid;
 
 
   @override
@@ -34,11 +35,12 @@ class _HomeState extends State<Home> {
     points = widget.userDetails.documents[0].data["points"];
     week = widget.adminDetails.documents[0].data["week"];
     picks = widget.adminDetails.documents[0].data["numpicks"];
+    uid = widget.userDetails.documents[0].data["uid"];
     List<Widget> _children = [
 //    Profile(userData.documents[0].data[0].data["name"], userData.documents[0].data[0].data["points"], adminData.documents[0].data[0].data["week"], adminData.documents[0].data[0].data["numpicks"]),
       Profile(name, points, week, picks),
       Standings(Colors.green),
-      Picks()
+      Picks(picks, uid, week, name, points)
     ];
     return FutureBuilder(
         future: getSetup(),
