@@ -23,6 +23,7 @@ class _PicksState extends State<Picks> {
   Widget build(BuildContext context) {
     setState(() {
       getUserPicks();
+      widget.numPicked = widget.pickSet.length;
     });
     return Scaffold(
       body: getWomenList(),
@@ -48,7 +49,6 @@ class _PicksState extends State<Picks> {
         } else {
           return
             ListView.builder(
-//              itemExtent: 150.0,
                 itemCount: snapshot.data.length,
                 itemBuilder: (_, index) {
                   return Card(
@@ -94,7 +94,6 @@ class _PicksState extends State<Picks> {
     );
   }
 
-  // TODO Color button based on if its in the pickset.
   Widget isStillIn(weekNum, ladyID){
     if(weekNum != 100) {
       return
@@ -102,34 +101,47 @@ class _PicksState extends State<Picks> {
           title: Center(child: Text("Eliminated Week " + weekNum.toString()),),
         );
     }else {
-      if (widget.numPicked != widget.weekPicks){
+      if (widget.numPicks != widget.weekPicks && widget.pickSet.contains(ladyID)){
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             RaisedButton(
                 child: Center(child: Text("Pick me?"),),
-                onPressed: () => onPress(ladyID))
+                onPressed: () => onPress(ladyID),
+              color: Colors.red,
+            )
           ],
         );
       } else {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RaisedButton(
-                child: Center(child: Text("Pick me?"),),
-                onPressed: () => null
-            ),
-
-
-          ],
-        );
+        if (!widget.pickSet.contains(ladyID)) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                  child: Center(child: Text("Pick me?"),),
+                  onPressed: () => onPress(ladyID),
+                color: Colors.green,
+              )
+            ],
+          );
+        } else {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                  child: Center(child: Text("Pick me?"),),
+                  onPressed: () => null
+              ),
+            ],
+          );
+        }
       }
 
     }
   }
 
   Widget getFloatyButton() {
-    if (widget.numPicks == 3) {
+    if (widget.numPicked != widget.weekPicks) {
       return FloatingActionButton.extended(
         onPressed: () {
           saveUserPicks();
@@ -144,9 +156,8 @@ class _PicksState extends State<Picks> {
         onPressed: () {
           // Add your onPressed code here!
         },
-        label: Text('Picked ' + widget.numPicked.toString() + " of " +
-            widget.numPicks.toString() + " this week"),
-        icon: Icon(Icons.thumb_up),
+        label: Text("Save these " + widget.numPicked.toString() + " picks?"),
+        icon: Icon(Icons.save),
         backgroundColor: Colors.pink,
       );
     }
@@ -162,7 +173,7 @@ class _PicksState extends State<Picks> {
     } else{
       setState(() {
         widget.pickSet.add(id);
-        widget.numPicked ++;
+        widget.numPicked++;
       });
     }
   }
@@ -175,11 +186,13 @@ class _PicksState extends State<Picks> {
       for (int i = 0; i < 30; i++){
         if (widget.weekPicks.picks[i] == true) {
           widget.pickSet.add(i);
+          widget.numPicked++;
         }
       }
     } else {
       widget.weekPicks = UserPicks(widget.name, widget.points, widget.uid, widget.weekNum);
     }
+
   }
 
   Future saveUserPicks() async {

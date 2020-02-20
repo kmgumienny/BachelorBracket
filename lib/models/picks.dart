@@ -56,7 +56,7 @@ class UserPicks{
   // Extract a Pick object from a Map object
   UserPicks.fromSnapshot(DocumentSnapshot ss) {
     this._name = ss.data['name'];
-    this._picks = ss.data['picks'];
+    this._picks = List.castFrom<dynamic, bool>(ss.data['picks']);
     this._points = ss.data['points'];
     this._uid = ss.data['uid'];
     this._week = ss.data['week'];
