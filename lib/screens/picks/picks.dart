@@ -2,29 +2,73 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:bachbracket/models/picks.dart';
+import 'package:async/async.dart';
 
 class Picks extends StatefulWidget {
   @override
   _PicksState createState() => _PicksState();
-  final numPicks;
-  final uid;
-  final weekNum;
-  final name;
-  final points;
+  var numPicks;
+  var uid;
+  var weekNum;
+  var name;
+  var points;
   var numPicked = 0;
   UserPicks weekPicks;
   var pickSet= new Set();
+  String documentID;
 
-  Picks(this.numPicks, this.uid, this.weekNum, this.name, this.points);
+  Picks(numPicks, uid, weekNum, name, points){
+    this.numPicks = numPicks;
+    this.uid = uid;
+    this.weekNum = weekNum;
+    this.name = name;
+    this.points = points;
+    getUserPicks();
+  }
+
+
+
+Future getUserPicks() async {
+  var firestore = Firestore.instance;
+  QuerySnapshot qn = await firestore.collection("picks").where('uid', isEqualTo: uid).where('week', isEqualTo: weekNum).getDocuments();
+  if (qn.documents.length != 0){
+    weekPicks = UserPicks.fromSnapshot(qn.documents[0]);
+    documentID = qn.documents[0].documentID;
+    for (int i = 0; i < 30; i++){
+      if (weekPicks.picks[i] == true) {
+        pickSet.add(i);
+        numPicked++;
+      }
+    }
+  } else {
+    weekPicks = UserPicks(name, points, uid, weekNum);
+  }
 }
+}
+
+
+//Future getUserPicks() async {
+//  var firestore = Firestore.instance;
+//  QuerySnapshot qn = await firestore.collection("picks").where('uid', isEqualTo: uid).where('week', isEqualTo: weekNum).getDocuments();
+//  if (qn.documents.length != 0){
+//    weekPicks = UserPicks.fromSnapshot(qn.documents[0]);
+//    documentID = qn.documents[0].documentID;
+//    for (int i = 0; i < 30; i++){
+//      if (weekPicks.picks[i] == true) {
+//        pickSet.add(i);
+//        numPicked++;
+//      }
+//    }
+//  } else {
+//    weekPicks = UserPicks(name, points, uid, weekNum);
+//  }
+//}
 
 class _PicksState extends State<Picks> {
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      getUserPicks();
-      widget.numPicked = widget.pickSet.length;
-    });
+
+
     return Scaffold(
       body: getWomenList(),
         floatingActionButton: getFloatyButton(),
@@ -106,14 +150,13 @@ class _PicksState extends State<Picks> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             RaisedButton(
-                child: Center(child: Text("Pick me?"),),
+                child: Center(child: Text("Change your mind?"),),
                 onPressed: () => onPress(ladyID),
               color: Colors.red,
             )
           ],
         );
-      } else {
-        if (!widget.pickSet.contains(ladyID)) {
+      } else if (widget.numPicks != widget.weekPicks && !widget.pickSet.contains(ladyID)) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -129,22 +172,22 @@ class _PicksState extends State<Picks> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
-                  child: Center(child: Text("Pick me?"),),
+                  child: Center(child: Text("Unavailable"),),
                   onPressed: () => null
               ),
             ],
           );
         }
-      }
+
 
     }
   }
 
   Widget getFloatyButton() {
-    if (widget.numPicked != widget.weekPicks) {
+    if (widget.numPicked != widget.numPicks) {
       return FloatingActionButton.extended(
         onPressed: () {
-          saveUserPicks();
+          return null;
         },
         label: Text('Picked ' + widget.numPicked.toString() + " of " +
             widget.numPicks.toString() + " this week"),
@@ -154,7 +197,7 @@ class _PicksState extends State<Picks> {
     } else {
       return FloatingActionButton.extended(
         onPressed: () {
-          // Add your onPressed code here!
+          saveUserPicks();
         },
         label: Text("Save these " + widget.numPicked.toString() + " picks?"),
         icon: Icon(Icons.save),
@@ -165,44 +208,43 @@ class _PicksState extends State<Picks> {
 
   void onPress(int id) {
     print('pressed $id');
-    if (widget.pickSet.contains(id)) {
-      widget.pickSet.remove(id);
-      setState(() {
-        widget.numPicked--;
-      });
-    } else{
-      setState(() {
-        widget.pickSet.add(id);
-        widget.numPicked++;
-      });
-    }
-  }
-
-  Future getUserPicks() async {
-    var firestore = Firestore.instance;
-    QuerySnapshot qn = await firestore.collection("picks").where('uid', isEqualTo: widget.uid).where('week', isEqualTo: widget.weekNum).getDocuments();
-    if (qn.documents.length != 0){
-      widget.weekPicks = UserPicks.fromSnapshot(qn.documents[0]);
-      for (int i = 0; i < 30; i++){
-        if (widget.weekPicks.picks[i] == true) {
-          widget.pickSet.add(i);
+    if (widget.numPicked == widget.numPicks && !widget.pickSet.contains(id)){
+      AlertDialog alertDialog = AlertDialog(
+        title: Center(child: Text("Error Adding"),),
+        content: Text("Unselect someone before re-choosing."),
+      );
+      showDialog(context: context, builder: (_) => alertDialog);
+      return;
+    }else {
+      if (widget.pickSet.contains(id)) {
+        widget.pickSet.remove(id);
+        setState(() {
+          widget.numPicked--;
+        });
+      } else{
+        setState(() {
+          widget.pickSet.add(id);
           widget.numPicked++;
-        }
+        });
       }
-    } else {
-      widget.weekPicks = UserPicks(widget.name, widget.points, widget.uid, widget.weekNum);
     }
-
   }
 
   Future saveUserPicks() async {
     var firestore = Firestore.instance;
     widget.weekPicks.setPicks(widget.pickSet);
-
     Map saveSet = widget.weekPicks.toMap();
 
     firestore.runTransaction((Transaction transactionHandler) {
+      if (widget.documentID != null) {
+        return firestore.collection('picks').document(widget.documentID).updateData(saveSet);
+      } else
       return firestore.collection('picks').document().setData(saveSet);
     });
+
+    AlertDialog alertDialog = AlertDialog(
+      title: Center(child: Text("Succesfully saved picks!"),),
+    );
+    showDialog(context: context, builder: (_) => alertDialog);
   }
 }
