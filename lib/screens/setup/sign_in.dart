@@ -35,10 +35,7 @@ class SignInScreen extends State<SignIn> {
         decoration: InputDecoration(labelText: 'Enter Password'),
         validator: (String pass) {
           if (pass.isEmpty) {
-            return 'Password is required, dummy';
-          }
-          if (pass.length < 6) {
-            return 'Password must be longer than 6 chars';
+            return 'Password is required';
           }
           _pass = pass;
           return null;
