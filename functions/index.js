@@ -26,33 +26,18 @@ function calcPickPts() { //calculates points per pick (50/# women left)
             }
 
             snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
-                numWomen += 1;
-                remWomen.push(doc.data('name'))
+                numWomen++;
+                remWomen.push(doc.id)
             });
+
+            pts = 50 / numWomen;
+            return pts, remWomen;
 
         })
         .catch(err => {
             console.log('Error getting documents', err);
         });
-
-    /*
-    snapshot.forEach(function(childSnapshot){//individual woman (hannahann, madison, i.e.)
-    var name = childSnapshot.child("name").val();//get name value
-    console.log(name)
-    numWomen += 1
-    remWomen.push(name)
-    //if(week == 100){
-    //    numWomen += 1;//incr women who made it
-    //    remWomen.push(name)
-    */
-    //}
-    //calc pts
-    pts = 50 / numWomen;
-
-    console.log(pts)
-    console.log(remWomen)
-    return pts, remWomen;
+    
 }
 
     
@@ -92,13 +77,11 @@ exports.onScoringUpdate = functions.firestore
 
         console.log('running calcPickPts function....');
         var ptsPerPick, remWomen = calcPickPts();
-        console.log('function completed with no errros!')
 
         //get users weekly score
         console.log('running calcUserScoresFn');
         var score = calcUserScores(ptsPerPick, remWomen);
-        console.log('function ran! Score: ');
-        console.log(score);
+
 
         //update score
         var admin = require("firebase-admin");
