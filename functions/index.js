@@ -2,6 +2,7 @@ const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 
 admin.initializeApp();
+db = admin.firestore();
 
 
 // // Create and Deploy Your First Cloud Functions
@@ -11,30 +12,50 @@ admin.initializeApp();
 //  response.send("Hello from Firebase!");
 // });
 
-function calcPickPts(){ //calculates points per pick (50/# women left)
+function calcPickPts() { //calculates points per pick (50/# women left)
     var pts = 0;
     var numWomen = 0;
     var remWomen = [];
 
     //loop through women and incr count for each remaining
-    var query = functions.firebase.database().ref('women').orderByKey();
-    query.once("value")//database
-        .then(function(snapshot){//women
-            snapshot.forEach(function(childSnapshot){//individual woman (hannahann, madison, i.e.)
-                var week = childSnapshot.child("week").val();//get week value
-                var name = childSnapshot.child("name").val();//get name value
-                if(week == 100){
-                    numWomen += 1;//incr women who made it
-                    remWomen.push(name)
-                }
-            })
-        })
+    let query = db.collection("women").where('week', '==', 100).get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return;
+            }
 
+            snapshot.forEach(doc => {
+                console.log(doc.id, '=>', doc.data());
+                numWomen += 1;
+                remWomen.push(doc.data('name'))
+            });
+
+        })
+        .catch(err => {
+            console.log('Error getting documents', err);
+        });
+
+    /*
+    snapshot.forEach(function(childSnapshot){//individual woman (hannahann, madison, i.e.)
+    var name = childSnapshot.child("name").val();//get name value
+    console.log(name)
+    numWomen += 1
+    remWomen.push(name)
+    //if(week == 100){
+    //    numWomen += 1;//incr women who made it
+    //    remWomen.push(name)
+    */
+    //}
     //calc pts
     pts = 50 / numWomen;
 
+    console.log(pts)
+    console.log(remWomen)
     return pts, remWomen;
 }
+
+    
 
 function calcUserScores(pts, remWomen) {//loop through users and update scores
     var score = 0;
@@ -71,10 +92,7 @@ exports.onScoringUpdate = functions.firestore
 
         console.log('running calcPickPts function....');
         var ptsPerPick, remWomen = calcPickPts();
-        console.log('function ran! Points per pick: ');
-        console.log(ptsPerPick);
-        console.log('// remWomen: ');
-        console.log(remWomen);
+        console.log('function completed with no errros!')
 
         //get users weekly score
         console.log('running calcUserScoresFn');
