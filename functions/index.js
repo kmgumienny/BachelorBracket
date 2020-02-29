@@ -1,3 +1,4 @@
+import DataSnapshot from 'firebase';
 const functions = require('firebase-functions');
 
 // // Create and Deploy Your First Cloud Functions
@@ -40,17 +41,16 @@ function calcUserScores(pts, remWomen) {//loop through users and update scores
     query.once("value")//database
         .then(function (snapshot) {//users
             snapshot.forEach(function (childSnapshot) {//individual user (julien, pete, i.e.)
-                childSnapshot.forEach(function(c2Snapshot){//picks
-                    c2Snapshot.forEach(function(c3Snapshot){//woman picked
-                        var pickName = c3Snapshot.child("name").val();//get women name
+                for(var cd in childSnapshot.child("picks")){//for each woman
 
-                        for(var name in remWomen){
-                            if(name == pickName){
-                                numCorrect += 1;
-                            }
+                    var pickName = cd.child("name").val();//get womans name
+                    for(var name in remWomen){
+                        if(name == pickName){
+                            numCorrect += 1;
                         }
-                    })
-                })
+                    }
+
+                }
             })
         })
 
@@ -70,13 +70,23 @@ export const onScoringUpdate = functions.database
 
         var ptsPerPick, remWomen = calcPickPts();
 
-
-
         //get users weekly score
         var score = calcUserScores(ptsPerPick, remWomen);
 
         //update score
+        var admin = require("firebase-admin");
+        var db = admin.database();
+        var ref = db.ref("users");
+        var i = 0
+        for(var cd in ref){
+            var prevScores = cd.child("scores").val();
+            prevScores.push(score[i])
+            cd.update({
+                scores: [prevScores],
+                total: prevScores.reduce((a, b) => a + b, 0)
+            });
+            i += 1;
+        }
         
-
         return null
     })
