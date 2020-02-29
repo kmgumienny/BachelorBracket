@@ -1,5 +1,9 @@
-import DataSnapshot from 'firebase';
+const admin = require('firebase-admin');
 const functions = require('firebase-functions');
+
+admin.initializeApp();
+
+const firestore = admin.firestore();
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -62,16 +66,26 @@ function calcUserScores(pts, remWomen) {//loop through users and update scores
     return score;
 }
 
-export const onScoringUpdate = functions.database
-    .ref('admin/{adminId}')
+exports.onScoringUpdate = functions.firestore
+    .document('admin/{adminId}/week')
     .onUpdate((change, context) => {
         const before = change.before.val()
         const after = change.after.val()
+        console.log(before);
+        console.log(after);
 
+        console.log('running calcPickPts function....');
         var ptsPerPick, remWomen = calcPickPts();
+        console.log('function ran! Points per pick: ');
+        console.log(ptsPerPick);
+        console.log('// remWomen: ');
+        console.log(remWomen);
 
         //get users weekly score
+        console.log('running calcUserScoresFn');
         var score = calcUserScores(ptsPerPick, remWomen);
+        console.log('function ran! Score: ');
+        console.log(score);
 
         //update score
         var admin = require("firebase-admin");
@@ -80,9 +94,10 @@ export const onScoringUpdate = functions.database
         var i = 0
         for(var cd in ref){
             var prevScores = cd.child("scores").val();
+            console.log(prevScores)
             prevScores.push(score[i])
             cd.update({
-                scores: [prevScores],
+                points: [prevScores],
                 total: prevScores.reduce((a, b) => a + b, 0)
             });
             i += 1;
