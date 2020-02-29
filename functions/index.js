@@ -3,7 +3,6 @@ const functions = require('firebase-functions');
 
 admin.initializeApp();
 
-const firestore = admin.firestore();
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -18,7 +17,7 @@ function calcPickPts(){ //calculates points per pick (50/# women left)
     var remWomen = [];
 
     //loop through women and incr count for each remaining
-    var query = firebase.database().ref('women').orderByKey();
+    var query = functions.firebase.database().ref('women').orderByKey();
     query.once("value")//database
         .then(function(snapshot){//women
             snapshot.forEach(function(childSnapshot){//individual woman (hannahann, madison, i.e.)
@@ -67,12 +66,8 @@ function calcUserScores(pts, remWomen) {//loop through users and update scores
 }
 
 exports.onScoringUpdate = functions.firestore
-    .document('admin/{adminId}/week')
+    .document('admin/{adminID}')
     .onUpdate((change, context) => {
-        const before = change.before.val()
-        const after = change.after.val()
-        console.log(before);
-        console.log(after);
 
         console.log('running calcPickPts function....');
         var ptsPerPick, remWomen = calcPickPts();
@@ -104,4 +99,4 @@ exports.onScoringUpdate = functions.firestore
         }
         
         return null
-    })
+})
