@@ -135,23 +135,6 @@ exports.onScoringUpdate = functions.firestore
         .catch(err => {
             console.log('Error getting documents', err);
         });
-
-        /*update score
-        var admin = require("firebase-admin");
-        var db = admin.database();
-        var ref = db.ref("users");
-        var i = 0
-        for(var cd in ref){
-            var prevScores = cd.child("scores").val();
-            console.log(prevScores)
-            prevScores.push(score[i])
-            cd.update({
-                points: [prevScores],
-                total: prevScores.reduce((a, b) => a + b, 0)
-            });
-            i += 1;
-        }
-        */
-        
+    
         return null
 })
