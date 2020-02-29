@@ -4,7 +4,7 @@ const functions = require('firebase-functions');
 admin.initializeApp();
 db = admin.firestore();
 
-function calcPickPts() { //calculates points per pick (50/# women left)
+function calcPickPts(currWeek) { //calculates points per pick (50/# women left)
     var pts = 0;
     var numWomen = 0;
     var remWomen = [];
@@ -22,10 +22,9 @@ function calcPickPts() { //calculates points per pick (50/# women left)
                 remWomen.push(doc.id)
             });
 
-            // return statement inside promise because async
             pts = 50 / numWomen;
-            var score = calcUserScores(pts, remWomen)
-            return score;
+            // call function to calculate all scores per user
+            calcUserScores(pts, remWomen, currWeek)
 
         })
         .catch(err => {
@@ -34,11 +33,7 @@ function calcPickPts() { //calculates points per pick (50/# women left)
     
 }
 
-    
-
-async function calcUserScores(pts, remWomen) { //loop through users and update scores
-    var score = 0;
-    var numCorrect = 0;
+async function calcUserScores(pts, remWomen, currWeek) { //loop through users and update scores
 
     // query users
     let query = db.collection("users").get()
@@ -52,8 +47,13 @@ async function calcUserScores(pts, remWomen) { //loop through users and update s
 
             // loop through each user
             snapshot.forEach(doc => {
+                //console.log(doc.data())
+                // hold user's numCorrec
+                var numCorrect = 0;
+                var userID = doc.data().uid
 
                 for(var cd in doc.data().picks) { // loops through user picks
+
                     doc.data().picks[cd].get()
                     .then(childSnapshot => {
                         pickName = childSnapshot.id;
@@ -61,60 +61,80 @@ async function calcUserScores(pts, remWomen) { //loop through users and update s
                         // check if pick is in remWomen
                         for(var woman in remWomen){
                             if(remWomen[woman] == pickName){
-                                numCorrect ++; // incr
+                                numCorrect = numCorrect + 1; // incr
                             }
                         }
+                        // assign score to user
+                        var newScore = numCorrect * pts
+                        // update user points in db
+                        updateUserPoints(userID, currWeek, newScore)
+    
                     });
-                    // assign score to user
-                    newScore = numCorrect * pts
-                    console.log(score)
-                    // /updateUserPoints(week, currScore, newScore)
+
                 }
-                
+                    
             })
-
         })
-
         .catch(err => {
             console.log('Error getting documents', err);
         });
 
-    /*
-    var query = firebase.database().ref('users').orderByKey();
-    query.once("value")//database
-        .then(function (snapshot) {//users
-            snapshot.forEach(function (childSnapshot) {//individual user (julien, pete, i.e.)
-                for(var cd in childSnapshot.child("picks")){//for each woman
+}
 
-                    var pickName = cd.child("name").val();//get womans name
-                    for(var name in remWomen){
-                        if(name == pickName){
-                            numCorrect += 1;
-                        }
-                    }
+// finds user by userID and updates current score based on week
+async function updateUserPoints(userID, currWeek, newScore) {
+    console.log('running updateUserPoints...')
 
-                }
-            })
-        })
+    user = db.collection("users").where('uid', '==', userID).get()
+    .then(snapshot => {
+        if (snapshot.empty) {
+            console.log('No matching documents.');
+            return;
+        }
+        //get array
+        snapshot.forEach(doc => {
+            var ptsRay = doc.data().points
+            while(ptsRay.length < currWeek){
+                ptsRay.push(0);
+            }
 
+            if (ptsRay[currWeek-1] < newscore) {
+                ptsRay[currWeek-1] = newScore;
+            }
 
-    //Calculate score
-    score = numCorrect * pts;
+            var total = ptsRay.reduce((a, b) => a + b, 0);
 
+            db.collection("users").doc(doc.id).update({"points": ptsRay});
+            db.collection("users").doc(doc.id).update({"total":total});
 
-    return score;
-    */
-   return -1
+            console.log(ptsRay);
+            console.log(total);
+          });
+    });
 }
 
 exports.onScoringUpdate = functions.firestore
     .document('admin/{adminID}')
     .onUpdate((change, context) => {
 
-        console.log('running calcPickPts function....');
-        var score = calcPickPts();
+        // query admin collection
+        let week = db.collection('admin').get()
+        .then(snapshot => {
+            // error handling
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return;
+            }
+            // enter admin info and grab week
+            snapshot.forEach(doc => {
+                var currWeek = doc.data().week
+                calcPickPts(currWeek);
+              });
 
-
+        })
+        .catch(err => {
+            console.log('Error getting documents', err);
+        });
 
         /*update score
         var admin = require("firebase-admin");
