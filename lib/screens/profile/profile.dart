@@ -23,7 +23,7 @@ class _ProfileState extends State<Profile> {
       child: Center(
         child: Column(
           children: <Widget>[
-            Text("Your points: " + widget.points.toString()),
+            Text("Your points: " + widget.points[widget.week-1].toStringAsFixed(2)),
             Text("Week number: " + widget.week.toString()),
             // Text("Number of picks this week " + widget.picks.toString()),
             // Text("We need to make this screen look better and add functionality"
