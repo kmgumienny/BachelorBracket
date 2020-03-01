@@ -37,8 +37,7 @@ class _HomeState extends State<Home> {
     picks = widget.adminDetails.documents[0].data["numpicks"];
     uid = widget.userDetails.documentID;
     List<Widget> _children = [
-//    Profile(userData.documents[0].data[0].data["name"], userData.documents[0].data[0].data["points"], adminData.documents[0].data[0].data["week"], adminData.documents[0].data[0].data["numpicks"]),
-      Profile(name, uid, points, week, picks),
+      Profile(name, uid),
       Standings(Colors.green),
       Picks(picks, uid, week, name)
     ];
