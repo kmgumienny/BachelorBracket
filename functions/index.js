@@ -61,11 +61,11 @@ async function calcUserScores(pts, remWomen, currWeek) { //loop through users an
                         // check if pick is in remWomen
                         for(var woman in remWomen){
                             if(remWomen[woman] == pickName){
-                                numCorrect = numCorrect + 1; // incr
+                                numCorrect = numCorrect + 1;
                             }
                         }
+
                         totalCount = totalCount + 1;
-                        // assign score to user
                         var newScore = numCorrect * pts
 
                         // update user points in db
@@ -97,15 +97,24 @@ async function updateUserPoints(userName, currWeek, newScore) {
             }
             //get array
             snapshot.forEach(doc => {
+            
                 var ptsRay = doc.data().points
+
+                // add 0's for missing weeks
                 while (ptsRay.length < currWeek) {
                     ptsRay.push(0);
                 }
 
-                ptsRay[currWeek - 1] = newScore
+                // add new score
+                ptsRay[currWeek - 1] = newScore;
 
-                var total = ptsRay.reduce((a, b) => a + b, 0);
-
+                // update total
+                var total = 0;
+                for (i in ptsRay) {
+                    total = total + ptsRay[i];
+                }
+ 
+                // push to db
                 db.collection("users").doc(doc.id).update({ "points": ptsRay });
                 db.collection("users").doc(doc.id).update({ "total": total });
 
