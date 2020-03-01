@@ -4,7 +4,7 @@ const functions = require('firebase-functions');
 admin.initializeApp();
 db = admin.firestore();
 
-function calcPickPts(currWeek) { //calculates points per pick (50/# women left)
+async function calcPickPts(currWeek) { //calculates points per pick (50/# women left)
     var pts = 0;
     var numWomen = 0;
     var remWomen = [];
@@ -47,10 +47,10 @@ async function calcUserScores(pts, remWomen, currWeek) { //loop through users an
 
             // loop through each user
             snapshot.forEach(doc => {
-                //console.log(doc.data())
-                // hold user's numCorrec
+                
+                var totalCount = 0; // only update user points on last update
                 var numCorrect = 0;
-                var userID = doc.data().uid
+                var userName = doc.data().name
 
                 for(var cd in doc.data().picks) { // loops through user picks
 
@@ -64,11 +64,15 @@ async function calcUserScores(pts, remWomen, currWeek) { //loop through users an
                                 numCorrect = numCorrect + 1; // incr
                             }
                         }
+                        totalCount = totalCount + 1;
                         // assign score to user
                         var newScore = numCorrect * pts
+
                         // update user points in db
-                        updateUserPoints(userID, currWeek, newScore)
-    
+                        if (totalCount == doc.data().picks.length) {
+                            // call function on last update - async issue
+                            updateUserPoints(userName, currWeek, newScore)
+                        }
                     });
 
                 }
@@ -82,35 +86,33 @@ async function calcUserScores(pts, remWomen, currWeek) { //loop through users an
 }
 
 // finds user by userID and updates current score based on week
-async function updateUserPoints(userID, currWeek, newScore) {
-    console.log('running updateUserPoints...')
-
-    user = db.collection("users").where('uid', '==', userID).get()
-    .then(snapshot => {
-        if (snapshot.empty) {
-            console.log('No matching documents.');
-            return;
-        }
-        //get array
-        snapshot.forEach(doc => {
-            var ptsRay = doc.data().points
-            while(ptsRay.length < currWeek){
-                ptsRay.push(0);
+async function updateUserPoints(userName, currWeek, newScore) {
+    
+    // querying based on username. Should we query based on id? 
+    user = db.collection("users").where('name', '==', userName).get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return;
             }
+            //get array
+            snapshot.forEach(doc => {
+                var ptsRay = doc.data().points
+                while (ptsRay.length < currWeek) {
+                    ptsRay.push(0);
+                }
 
-            if (ptsRay[currWeek-1] < newscore) {
-                ptsRay[currWeek-1] = newScore;
-            }
+                ptsRay[currWeek - 1] = newScore
 
-            var total = ptsRay.reduce((a, b) => a + b, 0);
+                var total = ptsRay.reduce((a, b) => a + b, 0);
 
-            db.collection("users").doc(doc.id).update({"points": ptsRay});
-            db.collection("users").doc(doc.id).update({"total":total});
+                db.collection("users").doc(doc.id).update({ "points": ptsRay });
+                db.collection("users").doc(doc.id).update({ "total": total });
 
-            console.log(ptsRay);
-            console.log(total);
-          });
-    });
+                console.log("Successfully updated " + userName + "'s score!")
+
+            });
+        });
 }
 
 exports.onScoringUpdate = functions.firestore
