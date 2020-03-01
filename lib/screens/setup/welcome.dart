@@ -16,6 +16,8 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
+      print("APP START");
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Bachelor Bracket"),

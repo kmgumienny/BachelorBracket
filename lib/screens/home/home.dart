@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
 //    Profile(userData.documents[0].data[0].data["name"], userData.documents[0].data[0].data["points"], adminData.documents[0].data[0].data["week"], adminData.documents[0].data[0].data["numpicks"]),
       Profile(name, uid, points, week, picks),
       Standings(Colors.green),
-      Picks(picks, uid, week, name, points)
+      Picks(picks, uid, week, name)
     ];
     return FutureBuilder(
         future: getSetup(),

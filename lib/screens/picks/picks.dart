@@ -11,13 +11,11 @@ class Picks extends StatefulWidget {
   var uid;
   var weekNum;
   var name;
-  var points;
-  Picks(numPicks, uid, weekNum, name, points) {
+  Picks(numPicks, uid, weekNum, name) {
     this.numPicks = numPicks;
     this.uid = uid;
     this.weekNum = weekNum;
     this.name = name;
-    this.points = points;
   }
 }
 
@@ -26,7 +24,8 @@ class _PicksState extends State<Picks> {
   var _picks = new List<DocumentSnapshot>();
   var _picksID = new List<String>();
   String _documentID;
-  var _week;
+  var _total;
+  var _points;
 
   @override
   void initState() {
@@ -35,6 +34,7 @@ class _PicksState extends State<Picks> {
   }
   @override
   Widget build(BuildContext context) {
+    print("Points: $_points");
     return getWomenList();
   }
 
@@ -44,7 +44,8 @@ class _PicksState extends State<Picks> {
         await firestore.collection("users").document(widget.uid).get();
 
     print(userDetails.data);
-    var week = userDetails.data["week"];
+    var total = userDetails.data["total"];
+    var points = userDetails.data["points"];
     var picks = new List<DocumentSnapshot>();
     var picksID = new List<String>();
     for (var pick in userDetails.data["picks"]) {
@@ -52,8 +53,9 @@ class _PicksState extends State<Picks> {
       picksID.add(pick.documentID);
     }
     setState(() {
-      _week = week;
+      _total = total;
       _picks = picks;
+      _points = points;
       _picksID = picksID;
       _numPicked = picks.length;
     });
@@ -241,8 +243,8 @@ class _PicksState extends State<Picks> {
 
     var data = {
       "name": widget.name,
-      "points": widget.points,
-      "week": _week,
+      "points": _points,
+      "total": _total,
       "picks": picksL
     };
     firestore.runTransaction((Transaction transactionHandler) {
