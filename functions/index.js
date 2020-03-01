@@ -4,9 +4,8 @@ const functions = require('firebase-functions');
 admin.initializeApp();
 db = admin.firestore();
 
-async function calcPickPts(currWeek) { //calculates points per pick (50/# women left)
+async function calcPickPts(currWeek, numpicks) { //calculates points per pick (50/# women left)
     var pts = 0;
-    var numWomen = 0;
     var remWomen = [];
 
     //query every remaining woman
@@ -18,11 +17,10 @@ async function calcPickPts(currWeek) { //calculates points per pick (50/# women 
             }
             // loop through each woman
             snapshot.forEach(doc => {
-                numWomen++;
                 remWomen.push(doc.id)
             });
 
-            pts = 50 / numWomen;
+            pts = 50 / numpicks;
             // call function to calculate all scores per user
             calcUserScores(pts, remWomen, currWeek)
 
@@ -139,7 +137,8 @@ exports.onScoringUpdate = functions.firestore
             // enter admin info and grab week
             snapshot.forEach(doc => {
                 var currWeek = doc.data().week
-                calcPickPts(currWeek);
+                var numpicks = doc.data().numpicks
+                calcPickPts(currWeek, numpicks);
               });
 
         })
