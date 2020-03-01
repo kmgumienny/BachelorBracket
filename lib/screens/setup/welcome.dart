@@ -85,7 +85,11 @@ class _WelcomePageState extends State<WelcomePage> {
     if (snapShot == null || snapShot.data == null) {
       // Document with id == docId doesn't exist.
       CollectionReference collRef = Firestore.instance.collection('users');
-      var usr = {"name": user.displayName, "points": 0, "week": 0, "picks": new List<DocumentReference>()};
+      var usr = {
+        "name": user.displayName,
+        "points": [0],
+        "picks": new List<DocumentReference>()
+      };
       await collRef.document(user.uid).setData(usr);
     }
 

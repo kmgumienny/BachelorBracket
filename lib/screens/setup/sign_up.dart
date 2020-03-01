@@ -79,9 +79,12 @@ class SignUpScreen extends State<SignUp> {
     try {
       AuthResult user = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: _email, password: _pass);
-      CollectionReference collRef = Firestore.instance
-          .collection('users');
-      var usr = {"name": _name, "points": 0, "week": 0, "picks": new List<DocumentReference>()};
+      CollectionReference collRef = Firestore.instance.collection('users');
+      var usr = {
+        "name": _name,
+        "points": [0],
+        "picks": new List<DocumentReference>()
+      };
       await collRef.document(user.user.uid).setData(usr);
       AlertDialog alertDialog = AlertDialog(
         title: Text("Successfully created account."),
@@ -97,40 +100,41 @@ class SignUpScreen extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
-      return Scaffold(
-          appBar: AppBar(
-            title: Text('Login Here'),
-          ),
-          body: Container(
-            margin: EdgeInsets.all(24),
-            child: Form(
-                key: _formKey,
-                child: ListView(children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      SizedBox(height: 100),
-                      _getFields(),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      RaisedButton(
-                          child: Text(
-                            'Sign up',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                          onPressed: () {
-                            signUpFirebase();
-                          })
-                    ],
-                  ),
-                ])),
-          ));
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Login Here'),
+        ),
+        body: Container(
+          margin: EdgeInsets.all(24),
+          child: Form(
+              key: _formKey,
+              child: ListView(children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(height: 100),
+                    _getFields(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    RaisedButton(
+                        child: Text(
+                          'Sign up',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                        onPressed: () {
+                          signUpFirebase();
+                        })
+                  ],
+                ),
+              ])),
+        ));
   }
 
   _onLocationTap(BuildContext context) {
     Navigator.pushReplacementNamed(
-      context, '/signin',
+      context,
+      '/signin',
     );
   }
 }
