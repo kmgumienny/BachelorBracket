@@ -1,4 +1,3 @@
-import 'package:bachbracket/models/contestant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -19,7 +18,6 @@ class Picks extends StatefulWidget {
     this.weekNum = weekNum;
     this.name = name;
     this.points = points;
-    // getUserPicks();
   }
 }
 
@@ -63,15 +61,10 @@ class _PicksState extends State<Picks> {
 
   Future getWomen() async {
     var firestore = Firestore.instance;
-    // List<Contestant> contestants = new List();
     QuerySnapshot qn = await firestore
         .collection("women")
         .orderBy("week", descending: true)
         .getDocuments();
-    // await getUserPicks();
-    // for (var item in qn.documents) {
-    //   contestants.add(Contestant.fromSnapshot(item));
-    // }
     return qn.documents;
   }
 
@@ -241,12 +234,9 @@ class _PicksState extends State<Picks> {
 
   Future saveUserPicks() async {
     var firestore = Firestore.instance;
-    // Map saveSet = widget.picks.toMap();
     List<DocumentReference> picksL = new List<DocumentReference>();
     _picks.forEach((element) {
-      // if (!widget.picksID.contains(element.documentID)) {
       picksL.add(element.reference);
-      // }
     });
 
     var data = {
