@@ -83,6 +83,7 @@ class SignUpScreen extends State<SignUp> {
       var usr = {
         "name": _name,
         "points": [0],
+        "total": 0,
         "picks": new List<DocumentReference>()
       };
       await collRef.document(user.user.uid).setData(usr);

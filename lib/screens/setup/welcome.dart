@@ -88,6 +88,7 @@ class _WelcomePageState extends State<WelcomePage> {
       var usr = {
         "name": user.displayName,
         "points": [0],
+        "total": 0,
         "picks": new List<DocumentReference>()
       };
       await collRef.document(user.uid).setData(usr);
