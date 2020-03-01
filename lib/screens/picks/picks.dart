@@ -225,7 +225,7 @@ class _PicksState extends State<Picks> {
     } else {
       if (_picksID.contains(contestant.documentID)) {
         setState(() {
-          _picks.remove(contestant);
+          _picks.removeWhere((element) => element.documentID == contestant.documentID);
           _picksID.remove(contestant.documentID);
           _numPicked--;
         });
