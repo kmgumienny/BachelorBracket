@@ -106,7 +106,7 @@ class SignInScreen extends State<SignIn> {
   _onLocationTap(BuildContext context, AuthResult user) async {
     var firestore = Firestore.instance;
 
-    QuerySnapshot userDetails = await firestore.collection("users").where('uid', isEqualTo: user.user.uid).getDocuments();
+    DocumentSnapshot userDetails = await firestore.collection("users").document(user.user.uid).get();//where('uid', isEqualTo: user.user.uid).getDocuments();
     QuerySnapshot adminDetails = await firestore.collection("admin").getDocuments();
 
     Navigator.pushNamedAndRemoveUntil(context, '/home',  (_) => false, arguments: {'user': user, 'user_deets': userDetails, 'admin': adminDetails});

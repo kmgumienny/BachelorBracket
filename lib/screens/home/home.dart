@@ -8,7 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatefulWidget {
   final AuthResult user;
-  final QuerySnapshot userDetails;
+  final DocumentSnapshot userDetails;
   final QuerySnapshot adminDetails;
 
   Home(this.user, this.userDetails, this.adminDetails);
@@ -31,14 +31,14 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    name = widget.userDetails.documents[0].data["name"];
-    points = widget.userDetails.documents[0].data["points"];
+    name = widget.userDetails.data["name"];
+    points = widget.userDetails.data["points"];
     week = widget.adminDetails.documents[0].data["week"];
     picks = widget.adminDetails.documents[0].data["numpicks"];
-    uid = widget.userDetails.documents[0].data["uid"];
+    uid = widget.userDetails.documentID;
     List<Widget> _children = [
 //    Profile(userData.documents[0].data[0].data["name"], userData.documents[0].data[0].data["points"], adminData.documents[0].data[0].data["week"], adminData.documents[0].data[0].data["numpicks"]),
-      Profile(name, points, week, picks),
+      Profile(name, uid, points, week, picks),
       Standings(Colors.green),
       Picks(picks, uid, week, name, points)
     ];
@@ -53,7 +53,7 @@ class _HomeState extends State<Home> {
             return Scaffold(
               appBar: AppBar(
                   title: new Center(
-                child: Text('Welcome ' + snapshot.data[0].data["name"]),
+                child: Text('Welcome ' + snapshot.data["name"]),
               )),
               body: _children[_currentIndex],
               bottomNavigationBar: BottomNavigationBar(
@@ -85,8 +85,8 @@ class _HomeState extends State<Home> {
 
   Future getSetup() async {
     var firestore = Firestore.instance;
-    QuerySnapshot qn =
-        await firestore.collection("users").where('uid', isEqualTo: widget.user.user.uid).getDocuments();
-    return qn.documents;
+    DocumentSnapshot dn =
+        await firestore.collection("users").document(uid).get();
+    return dn;
   }
 }

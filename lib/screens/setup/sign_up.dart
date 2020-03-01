@@ -79,9 +79,10 @@ class SignUpScreen extends State<SignUp> {
     try {
       AuthResult user = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: _email, password: _pass);
-      DocumentReference ref = await Firestore.instance
-          .collection('users')
-          .add({"name": _name, "points": 0, "uid": user.user.uid, "week": 0});
+      CollectionReference collRef = Firestore.instance
+          .collection('users');
+      var usr = {"name": _name, "points": 0, "week": 0, "picks": new List<DocumentReference>()};
+      await collRef.document(user.user.uid).setData(usr);
       AlertDialog alertDialog = AlertDialog(
         title: Text("Successfully created account."),
         content: Text("Please Sign In."),

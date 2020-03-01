@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -35,11 +36,12 @@ class _WelcomePageState extends State<WelcomePage> {
             },
             child: Text("Sign Up"),
           ),
-          RaisedButton(
+          SignInButton(
+            Buttons.Google,
+            text: "Sign in with Google",
             onPressed: () {
               signInWithGoogle();
             },
-            child: Text("Sign in with Google"),
           ),
         ],
       ),
@@ -77,21 +79,18 @@ class _WelcomePageState extends State<WelcomePage> {
 
     var firestore = Firestore.instance;
 
-    final snapShot = await Firestore.instance
-        .collection('users')
-        .where('uid', isEqualTo: user.uid)
-        .getDocuments();
+    final snapShot =
+        await Firestore.instance.collection("users").document(user.uid).get();
 
-    if (snapShot == null || snapShot.documents.length == 0) {
+    if (snapShot == null || snapShot.data == null) {
       // Document with id == docId doesn't exist.
-      DocumentReference ref = await Firestore.instance.collection('users').add(
-          {"name": user.displayName, "points": 0, "uid": user.uid, "week": 0});
+      CollectionReference collRef = Firestore.instance.collection('users');
+      var usr = {"name": user.displayName, "points": 0, "week": 0, "picks": new List<DocumentReference>()};
+      await collRef.document(user.uid).setData(usr);
     }
 
-    QuerySnapshot userDetails = await firestore
-        .collection("users")
-        .where('uid', isEqualTo: user.uid)
-        .getDocuments();
+    DocumentSnapshot userDetails =
+        await firestore.collection("users").document(user.uid).get();
     QuerySnapshot adminDetails =
         await firestore.collection("admin").getDocuments();
 
