@@ -82,7 +82,7 @@ class SignUpScreen extends State<SignUp> {
       CollectionReference collRef = Firestore.instance.collection('users');
       var usr = {
         "name": _name,
-        "points": [0,0,0,0,0,0,0,0,0],
+        "points": [0],
         "total": 0,
         "picks": new List<DocumentReference>()
       };
