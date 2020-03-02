@@ -46,10 +46,10 @@ class _StandingsState extends State<Standings> {
 
       // bold the current user and places first
       if (userNames[i] == userDetails.data["name"]) {
-        scoreTableRows.insert(0, (DataRow(cells: [
+        scoreTableRows.add(DataRow(cells: [
         DataCell(Text(userNames[i].toString(), style: TextStyle(fontWeight: FontWeight.bold))),
         DataCell(Text(userScores[i].toString(), style: TextStyle(fontWeight: FontWeight.bold))),
-        ])));
+        ]));
       }
       else {
         scoreTableRows.add(DataRow(cells: [
@@ -63,7 +63,6 @@ class _StandingsState extends State<Standings> {
 
     // create past weeks table rows list
     for (var i = 0; i < userDetails.data["points"].length; i++) {
-      print(userDetails.data["points"].length);
       pastWeekTableRows.add(DataRow(cells: [
         DataCell(Text("Week " + (i + 1).toString())),
         DataCell(Text(userDetails.data["points"][i].toString())),
@@ -96,20 +95,20 @@ class _StandingsState extends State<Standings> {
                   } else {
                     return SingleChildScrollView(
                       child: Column(
-                          
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
-                            Center(
-                              child: Text("Your points: " + snapshot.data["total"].toStringAsFixed(2),
-                                  style: TextStyle(
-                                      fontSize: 20)), 
-                            ),
                             Center(
                              child: Text("Current Week: " +
                                   snapshot.data["week"].toString(), 
                                   style: TextStyle(
                                       fontSize: 20)), 
                             ),
+                            Container(
+                              height: 50,
+                              child: Center(child: Text('Current Leader Board',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold)))),
                             DataTable(
                               columns: [
                                 DataColumn(
@@ -125,6 +124,12 @@ class _StandingsState extends State<Standings> {
                               ],
                               rows: scoreTableRows,
                             ),
+                            Container(
+                              height: 73.5,
+                              child: Center(child: Text('Your Past Scores',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold)))),
                             DataTable(
                               columns: [
                                 DataColumn(
