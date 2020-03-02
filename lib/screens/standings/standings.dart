@@ -21,11 +21,11 @@ class _StandingsState extends State<Standings> {
 
   Future<Object> getDetails() async {
     var firestore = Firestore.instance;
-    
+
     // current user
     DocumentSnapshot userDetails =
         await firestore.collection("users").document(widget.uid).get();
-    
+
     // admin
     QuerySnapshot adminQuery =
         await firestore.collection("admin").getDocuments();
@@ -34,15 +34,15 @@ class _StandingsState extends State<Standings> {
     // get all users
     QuerySnapshot allUsersQuery =
         await firestore.collection("users").getDocuments();
-    
+
     // populate array with all users
     for (var user in allUsersQuery.documents) {
-        userScores.add(user.data["total"]);
-        userNames.add(user.data["name"]);
+      userScores.add(user.data["total"]);
+      userNames.add(user.data["name"]);
     }
 
     // create all scores table rows list
-    for (var i=0; i<userNames.length; i++) {
+    for (var i = 0; i < userNames.length; i++) {
       scoreTableRows.add(DataRow(cells: [
         DataCell(Text(userNames[i].toString())),
         DataCell(Text(userScores[i].toString())),
@@ -50,10 +50,10 @@ class _StandingsState extends State<Standings> {
     }
 
     // create past weeks table rows list
-    for (var i=0; i<userDetails.data["points"].length ; i++) {
+    for (var i = 0; i < userDetails.data["points"].length; i++) {
       print(userDetails.data["points"].length);
       pastWeekTableRows.add(DataRow(cells: [
-        DataCell(Text("Week " + (i+1).toString())),
+        DataCell(Text("Week " + (i + 1).toString())),
         DataCell(Text(userDetails.data["points"][i].toString())),
       ]));
     }
@@ -82,29 +82,51 @@ class _StandingsState extends State<Standings> {
                       child: Text("Loading"),
                     );
                   } else {
-                    return Column(children: <Widget>[
-                      Text("Your points: " +
-                          snapshot.data["total"].toStringAsFixed(2)),
-                      Text("Week number: " + snapshot.data["week"].toString()),
-                      DataTable(
-                        columns: [
-                          DataColumn(label: Text('User', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
-                          DataColumn(label: Text('Score', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
-                        ],
-                        rows: scoreTableRows,
-                      ),
-                      DataTable(
-                        columns: [
-                          DataColumn(label: Text('Week', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
-                          DataColumn(label: Text('Score', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
-                        ],
-                        rows: pastWeekTableRows,
-                      )
-                    ]);
+                    return SingleChildScrollView(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            Center(
+                              child: Text("Your points: " +
+                                  snapshot.data["total"].toStringAsFixed(2)),
+                            ),
+                            Center(
+                              child: Text("Week number: " +
+                                  snapshot.data["week"].toString()),
+                            ),
+                            DataTable(
+                              columns: [
+                                DataColumn(
+                                    label: Text('User',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold))),
+                                DataColumn(
+                                    label: Text('Score',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold))),
+                              ],
+                              rows: scoreTableRows,
+                            ),
+                            DataTable(
+                              columns: [
+                                DataColumn(
+                                    label: Text('Week',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold))),
+                                DataColumn(
+                                    label: Text('Score',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold))),
+                              ],
+                              rows: pastWeekTableRows,
+                            )
+                          ]),
+                    );
                   }
-                }))
-    );
+                })));
   }
-
-
 }
