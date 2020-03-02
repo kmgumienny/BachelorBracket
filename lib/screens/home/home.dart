@@ -38,7 +38,7 @@ class _HomeState extends State<Home> {
     uid = widget.userDetails.documentID;
     List<Widget> _children = [
       Profile(name, uid),
-      Standings(Colors.green),
+      Standings(name, uid),
       Picks(picks, uid, week, name)
     ];
     return FutureBuilder(
