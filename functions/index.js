@@ -85,6 +85,7 @@ async function calcUserScores(pts, remWomen, currWeek) { //loop through users an
 
 // finds user by userID and updates current score based on week
 async function updateUserPoints(userName, currWeek, newScore) {
+    var picksArr = []
     
     // querying based on username. Should we query based on id? 
     user = db.collection("users").where('name', '==', userName).get()
@@ -115,6 +116,9 @@ async function updateUserPoints(userName, currWeek, newScore) {
                 // push to db
                 db.collection("users").doc(doc.id).update({ "points": ptsRay });
                 db.collection("users").doc(doc.id).update({ "total": total });
+
+                // clear all picks
+                db.collection("users").doc(doc.id).update({ "picks": picksArr });
 
                 console.log("Successfully updated " + userName + "'s score!")
 
