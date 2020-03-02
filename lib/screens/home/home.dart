@@ -46,7 +46,7 @@ class _HomeState extends State<Home> {
         builder: (_, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
-              child: Text("Loading"),
+              //child: Text("Loading"),
             );
           } else {
             return Scaffold(
