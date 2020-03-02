@@ -43,10 +43,22 @@ class _StandingsState extends State<Standings> {
 
     // create all scores table rows list
     for (var i = 0; i < userNames.length; i++) {
-      scoreTableRows.add(DataRow(cells: [
+
+      // bold the current user and places first
+      if (userNames[i] == userDetails.data["name"]) {
+        scoreTableRows.insert(0, (DataRow(cells: [
+        DataCell(Text(userNames[i].toString(), style: TextStyle(fontWeight: FontWeight.bold))),
+        DataCell(Text(userScores[i].toString(), style: TextStyle(fontWeight: FontWeight.bold))),
+        ])));
+      }
+      else {
+        scoreTableRows.add(DataRow(cells: [
         DataCell(Text(userNames[i].toString())),
         DataCell(Text(userScores[i].toString())),
-      ]));
+        ]));
+      }
+
+      
     }
 
     // create past weeks table rows list
@@ -84,15 +96,19 @@ class _StandingsState extends State<Standings> {
                   } else {
                     return SingleChildScrollView(
                       child: Column(
+                          
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
                             Center(
-                              child: Text("Your points: " +
-                                  snapshot.data["total"].toStringAsFixed(2)),
+                              child: Text("Your points: " + snapshot.data["total"].toStringAsFixed(2),
+                                  style: TextStyle(
+                                      fontSize: 20)), 
                             ),
                             Center(
-                              child: Text("Week number: " +
-                                  snapshot.data["week"].toString()),
+                             child: Text("Current Week: " +
+                                  snapshot.data["week"].toString(), 
+                                  style: TextStyle(
+                                      fontSize: 20)), 
                             ),
                             DataTable(
                               columns: [
