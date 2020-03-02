@@ -1,55 +1,69 @@
 import 'package:bachbracket/widgets/women.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-
 class Standings extends StatefulWidget {
-  final name; 
+  final name;
   final uid;
-  
 
   Standings(this.name, this.uid);
 
-    @override
-    _StandingsState createState() => _StandingsState();
+  @override
+  _StandingsState createState() => _StandingsState();
 }
 
 class _StandingsState extends State<Standings> {
-  var _points;
   var userNames = [];
   var userScores = [];
-  int _week;
+  var scoreTableRows = new List<DataRow>();
+  var pastWeekTableRows = new List<DataRow>();
+
   Future<Object> getDetails() async {
     var firestore = Firestore.instance;
+    
+    // current user
     DocumentSnapshot userDetails =
         await firestore.collection("users").document(widget.uid).get();
+    
+    // admin
     QuerySnapshot adminQuery =
         await firestore.collection("admin").getDocuments();
     DocumentSnapshot adminDetails = adminQuery.documents[0];
-    
-    QuerySnapshot allUserTotals = 
+
+    // get all users
+    QuerySnapshot allUsersQuery =
         await firestore.collection("users").getDocuments();
-
-    var i = 0;
-    while(allUserTotals.documents.length > i){
-      DocumentSnapshot user2Details = allUserTotals.documents[i];
-      user2Details.data.forEach((k, v) => {
-        userNames.add(k),
-        userScores.add(v),
-      });
-
     
-
-      i++;
+    // populate array with all users
+    for (var user in allUsersQuery.documents) {
+        userScores.add(user.data["total"]);
+        userNames.add(user.data["name"]);
     }
-    
 
-    print(userScores);
+    // create all scores table rows list
+    for (var i=0; i<userNames.length; i++) {
+      scoreTableRows.add(DataRow(cells: [
+        DataCell(Text(userNames[i].toString())),
+        DataCell(Text(userScores[i].toString())),
+      ]));
+    }
+
+    // create past weeks table rows list
+    for (var i=0; i<userDetails.data["points"].length ; i++) {
+      print(userDetails.data["points"].length);
+      pastWeekTableRows.add(DataRow(cells: [
+        DataCell(Text("Week " + (i+1).toString())),
+        DataCell(Text(userDetails.data["points"][i].toString())),
+      ]));
+    }
 
     return {
-      "numUsers": i,
+      "numUsers": userNames.length,
       "names": userNames,
       "scores": userScores,
+      "scoreTableRows": scoreTableRows,
+      "pasWeekTableRows": pastWeekTableRows,
       "week": await adminDetails.data["week"],
       "total": await userDetails.data["total"],
       "points": await userDetails.data["points"]
@@ -69,131 +83,28 @@ class _StandingsState extends State<Standings> {
                     );
                   } else {
                     return Column(children: <Widget>[
-                      Text("Your points: " + snapshot.data["total"].toStringAsFixed(2)),
-                      Text("Week number: " + snapshot.data["userScores"].toString()),
-                      Table(
-                        border: TableBorder.all(),
-                        children: [
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week Number')
-                            ]),
-                            Column(children: [
-                              Text('Score')
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 1')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][0].toStringAsFixed(2))
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 2')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][1].toStringAsFixed(2))
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 3')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][2].toStringAsFixed(2))
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 4')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][3].toStringAsFixed(2))
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 5')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][4].toStringAsFixed(2))
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 6')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][5].toStringAsFixed(2))
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 7')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][6].toStringAsFixed(2))
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 8')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][7].toStringAsFixed(2))
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text('Week 9')
-                            ]),
-                            Column(children: [
-                              Text(snapshot.data["points"][8].toStringAsFixed(2))
-                            ])
-                          ]),
-                        ]
+                      Text("Your points: " +
+                          snapshot.data["total"].toStringAsFixed(2)),
+                      Text("Week number: " + snapshot.data["week"].toString()),
+                      DataTable(
+                        columns: [
+                          DataColumn(label: Text('User', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                          DataColumn(label: Text('Score', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                        ],
+                        rows: scoreTableRows,
                       ),
-                      Text('Standings'),
-                      Table(border: TableBorder.all(),
-                        children: [
-                          TableRow( children: [
-                            Column(children: [
-                              Text('UserName')
-                            ]),
-                            Column(children: [
-                              Text('Total Score:')
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text(userScores[1].toString())
-                            ]),
-                            Column(children: [
-                              Text(userScores[0].toString())
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text(userScores[5].toString())
-                            ]),
-                            Column(children: [
-                              Text(userScores[4].toString())
-                            ])
-                          ]),
-                          TableRow( children: [
-                            Column(children: [
-                              Text(userScores[9].toString())
-                            ]),
-                            Column(children: [
-                              Text(userScores[8].toString())
-                            ])
-                          ]),
-                        ]),
+                      DataTable(
+                        columns: [
+                          DataColumn(label: Text('Week', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                          DataColumn(label: Text('Score', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                        ],
+                        rows: pastWeekTableRows,
+                      )
                     ]);
                   }
-                })));
+                }))
+    );
   }
+
+
 }
