@@ -56,19 +56,22 @@ class _HomeState extends State<Home> {
               )),
               body: _children[_currentIndex],
               bottomNavigationBar: BottomNavigationBar(
+                selectedItemColor: Colors.pink,
                 onTap: onTabTapped,
                 currentIndex: _currentIndex,
                 items: [
                   BottomNavigationBarItem(
                     icon: new Icon(Icons.mood),
                     title: new Text('Me'),
+                   
                   ),
                   BottomNavigationBarItem(
                     icon: new Icon(Icons.assessment),
                     title: new Text('Standings'),
                   ),
                   BottomNavigationBarItem(
-                      icon: Icon(Icons.face), title: Text('Picks'))
+                      icon: Icon(Icons.face), 
+                      title: Text('Picks'))
                 ],
               ),
             );

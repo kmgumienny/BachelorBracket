@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
   ThemeData _theme() {
     return ThemeData(
         appBarTheme: AppBarTheme(
+          color: Colors.pink,
           textTheme: TextTheme(title: AppBarTextStyle),
         ),
         textTheme: TextTheme(
