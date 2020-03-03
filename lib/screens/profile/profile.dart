@@ -43,6 +43,7 @@ class _ProfileState extends State<Profile> {
                     );
                   } else {
                     return Column(children: <Widget>[
+                      Container(height: 15),
                       Text("Your Points: " +
                         snapshot.data["total"].toStringAsFixed(2), 
                         style: TextStyle(
