@@ -45,8 +45,8 @@ class _HomeState extends State<Home> {
         future: getSetup(),
         builder: (_, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              //child: Text("Loading"),
+            return Container(
+              color: Colors.white,
             );
           } else {
             return Scaffold(

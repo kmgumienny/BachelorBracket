@@ -38,9 +38,20 @@ class _ProfileState extends State<Profile> {
                 future: getDetails(),
                 builder: (_, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: Text("Loading"),
-                    );
+                    return Column(
+                      children: <Widget>[
+                        Container(height: MediaQuery.of(context).size.height/3),
+                        Text("Loading...",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontStyle: FontStyle.italic,
+                          )),
+                        Image.asset(
+                          "./assets/images/rose.png",
+                          height: 150,
+                          width: 150,
+                        ),
+                      ]);
                   } else {
                     return Column(children: <Widget>[
                       Container(height: 15),
