@@ -99,13 +99,13 @@ class _StandingsState extends State<Standings> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
                             Center(
-                             child: Text("Current Week: " +
+                             child: Text("Week Number: " +
                                   snapshot.data["week"].toString(), 
                                   style: TextStyle(
-                                      fontSize: 20)), 
-                            ),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold ))),
                             Container(
-                              height: 50,
+                              height: 100,
                               child: Center(child: Text('Current Leader Board',
                                         style: TextStyle(
                                             fontSize: 24,
@@ -128,7 +128,7 @@ class _StandingsState extends State<Standings> {
                               sortAscending: true,
                             ),
                             Container(
-                              height: 73.5,
+                              height: 100,
                               child: Center(child: Text('Your Past Scores',
                                         style: TextStyle(
                                             fontSize: 24,

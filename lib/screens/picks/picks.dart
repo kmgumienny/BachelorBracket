@@ -91,11 +91,13 @@ class _PicksState extends State<Picks> {
                           Container(
                             height: 150.0,
                             width: 150.0,
-                            child: Image.asset(
-                              snapshot.data[index].data["pic"],
-                              height: 300,
-                              width: 150,
-                            ),
+                            child: Opacity(
+                                opacity: snapshot.data[index].data["week"] == 100? 1 : 0.3, 
+                                  child: Image.asset(
+                                  snapshot.data[index].data["pic"],
+                                  height: 300,
+                                  width: 150,
+                                )),
                           ),
                           Expanded(
                             child: Column(

@@ -43,8 +43,25 @@ class _ProfileState extends State<Profile> {
                     );
                   } else {
                     return Column(children: <Widget>[
-                      Text("Your points: " + snapshot.data["total"].toStringAsFixed(2)),
-                      Text("Week number: " + snapshot.data["week"].toString()),
+                      Text("Your Points: " +
+                        snapshot.data["total"].toStringAsFixed(2), 
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold)),
+                      Text("Week Number: " +
+                        snapshot.data["week"].toString(), 
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold)),
+                      Container(
+                        height: 100,
+                        child: Center(
+                          child: Text("Your Current Picks",
+                              style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold)),
+                        ),
+                      ), 
                       Expanded(child: WomensList(widget.uid, snapshot.data["week"])),
                     ]);
                   }
