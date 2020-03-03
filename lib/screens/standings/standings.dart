@@ -60,6 +60,7 @@ class _StandingsState extends State<Standings> {
 
       
     }
+    scoreTableRows.sort((a,b)=> b.cells[1].child.toString().compareTo(a.cells[1].child.toString()));
 
     // create past weeks table rows list
     for (var i = 0; i < userDetails.data["points"].length; i++) {
@@ -123,6 +124,8 @@ class _StandingsState extends State<Standings> {
                                             fontWeight: FontWeight.bold))),
                               ],
                               rows: scoreTableRows,
+                              sortColumnIndex: 1,
+                              sortAscending: true,
                             ),
                             Container(
                               height: 73.5,
