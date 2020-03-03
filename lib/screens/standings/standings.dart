@@ -98,12 +98,6 @@ class _StandingsState extends State<Standings> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
-                            Center(
-                             child: Text("Week Number: " +
-                                  snapshot.data["week"].toString(), 
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold ))),
                             Container(
                               height: 100,
                               child: Center(child: Text('Current Leader Board',
